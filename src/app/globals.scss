@@ -1,0 +1,75 @@
+@import "~bootstrap/scss/bootstrap.scss";
+
+$primary: rgba(0, 0, 0, 1);
+$secondary: rgba(23, 162, 184, 1);
+$info: rgba(114, 188, 250, 0.7);
+$light-blue: rgba(173, 216, 230, 0.28);
+$success: rgba(0, 255, 150, 1);
+$warning: rgba(255, 0, 0, 1);
+$qbpurple: rgba(116, 72, 157, 1);
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Canta rell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-s erif;
+  // font-size: 3rem;
+  // margin: 20rem;
+}
+
+h1 {
+  background-color: $light-blue;
+  border-bottom: 1px solid $secondary;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  // color: $secondary;
+  color: $qbpurple;
+  padding: 15px 25px;
+}
+
+.container {
+  display: flex;
+  height: 800px;
+  justify-content: space-around;
+}
+
+.form {
+  margin-right: 75px;
+  padding: 20px 50px 50px;
+}
+
+.form-field {
+  border: 2px solid $secondary;
+  border-radius: 20px;
+  height: auto;
+  margin: auto;
+  position: relative;
+  width: 650px;
+}
+
+.label {
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+.reset {
+  margin: 5px 0 0 8px;
+}
+
+.save {
+  margin: 5px 10px 8px 0;
+}
+
+.text-area {
+  min-height: 8.5rem;
+}
+
+#form-name {
+  font-size: 1.55rem;
+  font-weight: 600;
+}
+
+@media only screen and (max-width: 400px) {
+  .form {
+    margin: auto;
+  }
+}
