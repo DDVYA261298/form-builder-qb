@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -14,17 +14,63 @@ import { validate } from "./validations.js";
 // import DisplayAlphaField from "@/app/FieldComponents/DisplayAlphaField.jsx";
 //@TODO breakdown all the items in components
 
+const getStoredFormData = () => {
+  try {
+    const storedFormDataJSON = localStorage.getItem("formData");
+    return storedFormDataJSON
+      ? JSON.parse(storedFormDataJSON)
+      : initialFieldState;
+  } catch (error) {
+    console.error("Error while retrieving stored form data:", error);
+    return initialFieldState;
+  }
+};
+// const getStoredFormData = () => {
+//   try {
+//     const storedFormDataJSON = localStorage.getItem("formData");
+//     if (storedFormDataJSON) {
+//       const storedFormData = JSON.parse(storedFormDataJSON);
+//       if (
+//         storedFormData.displayAlpha &&
+//         storedFormData.displayAlpha === "alphabetical"
+//       ) {
+//         storedFormData.displayAlpha = true;
+//       } else storedFormData.displayAlpha = false;
+//       return storedFormData;
+//     } else {
+//       return initialFieldState;
+//     }
+//   } catch (error) {
+//     console.error("Error while retrieving stored form data:", error);
+//     return initialFieldState;
+//   }
+// };
+
+const initialFieldState = {
+  label: "",
+  default: "",
+  choices: "",
+  displayAlpha: false,
+  multiSelect: false,
+};
+
 const Builder = () => {
   const MAX_CHARACTER_LIMIT = 40;
 
-  const [field, setField] = useState({
-    label: "",
-    default: "",
-    choices: "",
-    displayAlpha: false,
-    multiSelect: false,
-    //  required: false,
-  });
+  const [field, setField] = useState(getStoredFormData());
+
+  useEffect(() => {
+    localStorage.setItem("formData", JSON.stringify(field));
+  }, [field]);
+
+  //const [field, setField] = useState({
+  //   label: "",
+  //   default: "",
+  //   choices: "",
+  //   displayAlpha: false,
+  //   multiSelect: false,
+  //   //  required: false,
+  // });
   const [defaultChoiceNotification, setDefaultChoiceNotification] = useState({
     defaultCharacterMax: `${MAX_CHARACTER_LIMIT} character maximum`,
   });
@@ -215,16 +261,18 @@ const Builder = () => {
     })
       .then((data) => {
         if (data.status === 200) {
-          // localStorage.setItem("formData", data);
           setCreated("Post data successful");
         }
       })
-      .catch(console.error);
+      .catch(console.error)
+      .then(response => response.json())
+.then(data => console.log(data))
 
     console.log("Field data", data);
   };
 
   const resetState = () => {
+    localStorage.removeItem(FormData);
     setField({
       label: "",
       default: "",
