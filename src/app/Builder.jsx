@@ -1,32 +1,35 @@
+// Import statements for required libraries and components
 "use client";
 import React, { useState, useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
-//import Button from "react-bootstrap/Button";
 import axios from "axios";
 import { validate } from "./validations.js";
 import LabelField from "./FieldComponents/LabelField.jsx";
 import CheckboxField from "@/app/FieldComponents/CheckboxField.jsx";
-import DefaultValueField from "./FieldComponents/DefaultValueField.jsx";
+//import DefaultValueField from "./FieldComponents/DefaultValueField.jsx";
 import ChoicesField from "@/app/FieldComponents/ChoicesField.jsx";
-//import DisplayAlphaField from "@/app/FieldComponents/DisplayAlphaField.jsx";
 import ButtonSave from "./FieldComponents/buttonsave.jsx";
-//@TODO breakdown all the items in components
+import DisplayAlphaField from "./FieldComponents/DisplayAlphaField.jsx";
 
+// Local storage function to retrieve stored form data
 const getStoredFormData = () => {
   try {
-    const storedFormDataJSON = localStorage.getItem("formData");
-    return storedFormDataJSON
-      ? JSON.parse(storedFormDataJSON)
-      : initialFieldState;
+    if (typeof localStorage !== "undefined") {
+      const storedFormDataJSON = localStorage.getItem("formData");
+      return storedFormDataJSON
+        ? JSON.parse(storedFormDataJSON)
+        : initialFieldState;
+    }
   } catch (error) {
     console.error("Error while retrieving stored form data:", error);
-    return initialFieldState;
   }
+  return initialFieldState;
 };
 
+// Initial state for the form fields
 const initialFieldState = {
   label: "",
   default: "",
@@ -35,7 +38,10 @@ const initialFieldState = {
   multiSelect: false,
 };
 
+// React functional component for the form builder
 const Builder = () => {
+  // Maximum character limit for default choice
+
   const MAX_CHARACTER_LIMIT = 40;
 
   const [field, setField] = useState(getStoredFormData());
@@ -54,7 +60,7 @@ const Builder = () => {
   });
   const [created, setCreated] = useState("");
 
-  // Turn choices string into an array
+  // Function to normalize the choices string into an array
   const normalizeChoices = (choices) => {
     let choicesArray = choices.split("\n");
 
@@ -72,6 +78,7 @@ const Builder = () => {
 
     const defaultLowerCase = defaultChoice.toLowerCase().trim();
 
+    // Function to notify about the length of the default choice
     notifyDefaultChoiceLength(defaultLowerCase, MAX_CHARACTER_LIMIT);
 
     const choicesArrayLowerCase = choicesArray.map((choice) =>
@@ -83,8 +90,8 @@ const Builder = () => {
     }
     return choicesArray;
   };
+  // Function to notify about the length of the default choice
 
-  // Determine Default Choice length
   const notifyDefaultChoiceLength = (defaultChoice, maxCharacterLength) => {
     const choiceLength = defaultChoice.length;
     const characterDifference = maxCharacterLength - choiceLength;
@@ -105,14 +112,16 @@ const Builder = () => {
           characterDifference
         )} character past maximum`;
       } else {
+        const exceededCharacters = defaultChoice.slice(maxCharacterLength);
         notification = `${Math.abs(
           characterDifference
         )} characters past maximum`;
       }
     }
+
     setDefaultChoiceNotification({ defaultCharacterMax: notification });
   };
-
+  // Event handler for input field changes
   const handleChange = (event) => {
     event.persist();
     setField((field) => ({
@@ -130,7 +139,7 @@ const Builder = () => {
     }
   };
 
-  // Check box handling
+  // Event handler for checkbox changes
   const handleCheck = (event) => {
     event.persist();
     setField((field) => ({
@@ -139,9 +148,7 @@ const Builder = () => {
     }));
   };
 
-  // If Default Choice exceeds character limit
-  // remove it from choicesArray
-  // This is called after validations to prevent
+  // Function to remove an invalid default choice from choices
   const removeInvalidDefaultChoice = (defaultChoice, choicesArray) => {
     if (defaultChoice.length > MAX_CHARACTER_LIMIT) {
       choicesArray = choicesArray.filter(
@@ -151,7 +158,7 @@ const Builder = () => {
     return choicesArray;
   };
 
-  // Alphabetize Choices
+  // Function to remove an invalid default choice from choices
   const alphabetize = (choicesArray, displayAlpha) => {
     if (displayAlpha) {
       choicesArray = choicesArray.sort();
@@ -160,7 +167,7 @@ const Builder = () => {
     return choicesArray;
   };
 
-  // Move Default Choice to first choice unless Choices are alphabetized
+  // Function to prioritize the default choice
   const prioritizeDefaultChoice = (
     defaultChoice,
     choicesArray,
@@ -177,7 +184,8 @@ const Builder = () => {
     choicesArray = [defaultChoice, ...choicesArray];
     return choicesArray;
   };
-  //
+
+  // Event handler for form submission
   const handleSubmit = (event) => {
     event.preventDefault();
     let choicesArray = normalizeChoices(field.choices, field.displayAlpha);
@@ -207,7 +215,7 @@ const Builder = () => {
       submit(choicesArray);
     }
   };
-
+  // Function to submit data to a mock API
   const submit = (choicesArray) => {
     console.log(field);
     const data = {
@@ -216,8 +224,9 @@ const Builder = () => {
       choices: choicesArray,
       displayAlpha: field.displayAlpha,
       multiSelect: field.multiSelect,
-      //required: field.required,
     };
+
+    // Send a POST request to a mock API to submit form data
 
     axios({
       method: "POST",
@@ -227,7 +236,6 @@ const Builder = () => {
       .then((response) => {
         if (response.status === 200) {
           setCreated("Post data successful");
-          //console.log(response);
           return response.data;
         } else {
           throw new error("Http status ${response.status}");
@@ -240,15 +248,15 @@ const Builder = () => {
     console.log("Field data", data);
   };
 
+  // Function to reset the form state and local storage
   const resetState = () => {
-    localStorage.removeItem(FormData);
+    localStorage.removeItem("formData");
     setField({
       label: "",
+      multiSelect: false,
       default: "",
       choices: "",
       displayAlpha: false,
-      multiSelect: false,
-      // required: false,
     });
 
     setDefaultChoiceNotification({
@@ -263,7 +271,7 @@ const Builder = () => {
 
     setCreated("");
   };
-
+  // Event handler for the reset button
   const handleReset = (event) => {
     event.preventDefault();
     resetState();
@@ -276,20 +284,44 @@ const Builder = () => {
           <h1 id="form-name">Field Builder</h1>
 
           <Form className="form" onSubmit={handleSubmit}>
-            <LabelField handleChange={handleChange} value={field.label} />
+            <LabelField handleChange={handleChange} field={field.label} />
             <br></br>
             <CheckboxField
               handleCheck={handleCheck}
-              checked={field.multiSelect}
-            />
-            <br></br>
-            <DefaultValueField
-              handleChange={handleChange}
-              value={field.default}
-              defaultChoiceNotification={defaultChoiceNotification}
+              field={field.multiSelect}
             />
             <br></br>
 
+            {/* <DefaultValueField
+              handleChange={handleChange}
+              field={field.default}
+              defaultChoiceNotification={defaultChoiceNotification}
+            /> */}
+
+            <Form.Group as={Row} controlId="default" className="small-entry">
+              <Col md={4}>
+                <Form.Label className="label">Default Value</Form.Label>
+              </Col>
+              <Col>
+                <Form.Control
+                  type="text"
+                  name="default"
+                  placeholder="Asia"
+                  onChange={(e) => handleChange(e)}
+                  value={field.default}
+                  md={7}
+                />
+                <div
+                  style={{
+                    fontSize: 14,
+                  }}
+                >
+                  {defaultChoiceNotification.defaultCharacterMax}
+                </div>
+              </Col>
+            </Form.Group>
+
+            <br></br>
             <ChoicesField
               handleChange={handleChange}
               field={field.choices}
@@ -297,23 +329,13 @@ const Builder = () => {
             />
             <br></br>
 
-            <Form.Group as={Row}>
-              <Col md={4}> Display Order </Col>
-              <Col>
-                <Form.Select
-                  name="displayAlpha"
-                  onChange={handleChange}
-                  value={field.displayAlpha ? "alphabetical" : "original"}
-                >
-                  <option value="original">Original</option>
-                  <option value="alphabetical">Alphabetical</option>
-                </Form.Select>
-              </Col>
-            </Form.Group>
+            <DisplayAlphaField
+              handleChange={handleChange}
+              field={field.displayAlpha ? "alphabetical" : "original"}
+            />
+
             <br></br>
-
             <ButtonSave handleReset={handleReset} />
-
             <div style={{ fontSize: 18, color: "green" }}>{created}</div>
           </Form>
         </div>
