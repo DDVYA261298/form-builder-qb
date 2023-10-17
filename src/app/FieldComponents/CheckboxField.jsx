@@ -2,7 +2,7 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import { Row, Col } from "react-bootstrap";
-const CheckboxField = ({ field, handleCheck }) => (
+const CheckboxField = ({ handleCheck, field }) => (
   <Form.Group as={Row}>
     <Col md={4}> Type </Col>
     <Col>

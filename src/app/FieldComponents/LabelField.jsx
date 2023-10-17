@@ -2,7 +2,7 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import { Row, Col } from "react-bootstrap";
-const LabelTextBox = ({ field, handleChange }) => (
+const LabelTextBox = ({ handleChange, field }) => (
   <Form.Group as={Row} controlId="label">
     <Col md={4}>
       <Form.Label className="label">Label</Form.Label>
